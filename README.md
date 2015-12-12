@@ -7,14 +7,14 @@ begin, but you'll want to know how to use git and command line.
 
 To get started, clone this repository:
 
-`git clone blah`
+`git clone https://github.com/emhoracek/fntutorial.git`
 
 You'll need to install Stack, which installs the Haskell compiler and all the
 libraries and modules you'll need. Just follow the directions for your operating
 system [here](http://docs.haskellstack.org/en/stable/README.html).
 
 Make sure "./local/bin" is in your $PATH, so your OS can find everything
-Stack installs. (augh bad wording)
+Stack installs.
 
 Then change to the `fntutorial` directory, and run `stack build`. This will download and install everything! It will take a very long time if you haven't used Stack before. Be patient. Have some tea/coffee/beverage of choice.
 
