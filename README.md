@@ -9,18 +9,18 @@ To get started, clone this repository:
 
 `git clone https://github.com/emhoracek/fntutorial.git`
 
-You'll need to install Stack, which installs the Haskell compiler and all the
+You'll also need to install Stack, which installs the Haskell compiler and all the
 libraries and modules you'll need. Just follow the directions for your operating
 system [here](http://docs.haskellstack.org/en/stable/README.html).
 
-Make sure "./local/bin" is in your $PATH, so your OS can find everything
+Make sure "~/.local/bin" is in your $PATH, so your OS can find everything
 Stack installs.
 
 Then change to the `fntutorial` directory, and run `stack build`. This will download and install everything! It will take a very long time if you haven't used Stack before. Be patient. Have some tea/coffee/beverage of choice.
 
 (If you have any problems building, let me know so I can help!)
 
-Once the build is finished, run `stack exec site1` and visit [localhost:8000](http://localhost:8000) to see a "Hello world" Haskell site running on your machine!
+Once the build is finished, run `stack exec site1` and visit [localhost:8000](http://localhost:8000) to see a "Hello world" Haskell site running on your machine! Type CTRL-C to kill the server when you're done.
 
 Each site's source code contains a part of the tutorial. Read each "*.lhs" file's source to learn how to make Haskell sites with Fn, WAI, and Warp!
 

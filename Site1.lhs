@@ -32,31 +32,116 @@ Haskell.
 These import the libraries we'll need for the website: Fn, WAI (Web Application
 Interface), and Warp. In Haskell, you can import modules from libraries with
 `import` + the module name. Then you can optionally restrict the imports to just
-certain types or functions (as in the second and third lines).
+certain things. So we're only importing "Response" and "Application"
+from Wai and only "run" from Warp.
 
-We're going to use Fn as the framework, Warp for the server, and Wai for
-middleware (like it sounds, stuff in the middle between the framework and server).
+Why are we importing these specific things?
+
+* Fn is our web framework
+* Warp is the server
+* WAI is middleware (like it sounds, stuff in the middle between the framework and server).
 
 > data Context = Context { req :: FnRequest }
 
-Next we're making the context for our application. The idea is that
+Next we make the context for our application. The idea is that
 there's data we want to access when we're preparing a Response to send out to
-a user. It might be in a database, a cache, environment variables, wherever! In
-Fn, we wrap all those things up in a "Context". Here, the only information our
-Context has is about the Request (we'll add other stuff in a later site).
+a user. That data might be in a database, a cache, environment variables, wherever! In
+Fn, we wrap all those things up in a "Context". Since in this part of the tutorial, we're
+making the simplest app possible, we're only going to worry about the most
+basic information the user sends us -- the request.
 
-Language/syntax note: This is called a data type. Data types in Haskell are
-basically the coolest thing ever and you should read more about them (here).
-But just bookmark that for later, because it's enough to know that this is
-making a type called Context that has a constructor ALSO called Context, with
-a field that has the type FnRequest. `req` is a function that takes a Context
-and returns an FnRequest.
+<span class="haskell-note">This is called a data type. Data types in Haskell are
+basically the coolest thing ever and you should read more about them (here). This is
+making a type called Context. You can build this data type by filling in "fields". Here
+is a simpler example:
+
+> data Dog = Dog { name :: String, age :: Int }
+
+The data type is `Dog`. Its "constructor", also called `Dog`,
+has the fields `name` and `age`. `name` has the type `String` and `age` has the type
+`Int`. These types tell you what values you can use in the field. For example:
+
+> fido :: Dog -- read, "`fido` has the type `Dog`"
+> fido = Dog "Fido" 3
+
+You "fill in" the fields in the same order listed. You can also use the names of
+the fields like this:
+
+> rex :: Dog
+> rex = Dog { name = "Rex", age = 3 }
+
+Try describing your own dog below!
+
+> -- What's a good name for a dog? How old is the dog? 
+>
+>
+
+How old is a dog? We can create a function to find out!
+
+> dogsAge :: Dog -> Int
+> dogsAge dog = age dog
+
+
+You can also create NEW records based on ones you already have. So maybe the
+info about "rex" above is out of date!
+
+> updatedRex :: Dog
+> updatedRex = rex { age = 4 }
+
+This creates a new `Dog` based on our old `Dog`. Why not just change `rex` itself?
+
+> -- rex = rex { age = 4 }
+
+I've commented that out because it will cause an error! In Haskell, you can't
+"mutate" data. `rex` is `rex` and will always be `rex`.
+
+</span>
 
 > instance RequestContext Context where
 >  getRequest ctxt = req ctxt
 >  setRequest ctxt newRequest = ctxt { req = newRequest }
+  
+These lines make `Context` an "instance" of `RequestContext`. Fn uses these
+functions, `getRequest` and `setRequest`, to help us respond to requests.
 
-These lines spell out for Fn how to get the request from the Context we made earlier.
+<span class="haskell-note"> `RequestContext` is a typeclass. By using a typeclass,
+we have the freedom to make a `Context`, a `Ctxt`, a `MyAwesomeRequestWrapperType`
+-- whatever type we want to carry around whatever data we want! As long as we can
+get an FnRequest OUT of it and put a new FnRequest INTO it, Fn will be able to use
+our type. Let's look at another example!
+
+> data PizzaJungle = Totoro { request :: FnRequest,
+>                             mothersMaidenName :: String,
+>                             isAmbidextrous :: Bool }
+>
+> instance RequestContext PizzaJungle where
+>   getRequest pizzaJungle = request pizzaJungle
+>   setRequest pizzaJungle newReq = pizzaJungle { request = newReq }
+
+Okay, I got very very silly here, but I want to make the point that it's not
+really important that your app specifically have a `Context`, but it's important that
+it has *something* (even a `PizzaJungle`!) that's a `RequestContext`. Also
+notice that you can as many and whatever fields you want in your context, as
+long as you also have some field (name doesn't matter!) that's an `FnRequest`.</span>
+
+Exercise
+--------
+
+Suppose your app had the `AppContext` below.
+
+> data AppContext = AppContext { fnrequest :: FnRequest,
+>                                secretKey :: String }
+
+How could you write the `RequestContext` instance for `AppContext`?
+
+> -- uncomment the next lines by deleting the "--"s when you have a solution!
+> -- instance RequestContext AppContext where
+> --   getRequest ????
+> --   setRequest ????
+
+(Need help?)
+
+Okay, so back to `Context`. How do we actually use that?
 
 > site :: Context -> IO Response
 > site ctxt = route ctxt [ end ==> indexHandler ]
@@ -81,5 +166,13 @@ I said earlier that WAI is the middleware between our site and the server. This
 is where we use WAI. Warp expects an app, so we use Fn's "toWAI" function to
 turn an initial context and our `site` into an Application. `run 3000 waiApp`
 means to run the Warp server with this app on port 3000.
+
+Exercises
+---------
+
+Try 
+
+
+
 
 Okay, so this site wasn't very exciting... let's learn more about routing and handlers!

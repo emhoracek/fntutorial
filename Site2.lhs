@@ -72,25 +72,25 @@ Have you noticed I'm saying "Maybe" a lot?
 > addHandler :: Context -> IO (Maybe Response)
 > addHandler ctxt = okText "Find the result of adding different things by visitng \"add/firstThing/secondThing/\""
 
-Hey it's our old friend the indexHandler! And a very similar one called `addHandler`. This time lets take a closer look at
+Hey it's our old friend the indexHandler! And a very similar one called
+`addHandler`. This time lets take a closer look at
 that first line. That is called a "type signature". You could read that line
 aloud as "indexHandler has the type Context to IO of Maybe Response". It takes
 a Context and returns somethign with this other type, `IO (Maybe Response)`.
 
-IO? of Maybe Response? What? Those are still just types. IO is a special sort of
-type that indicates some action, like getting a data from a database or reading
-a file. It's really useful to be able to do those things in a handler, so
-Handler functions have the type IO. But we said the IO is an action -- an
-action that does something. Our type doesn't say what that action might be,
-but it does say that it has to return a value with a certain other type --
-`Maybe Response`.
+IO? Maybe Response? They may look a bit different, but those are still just types.
+IO is a special sort of type that indicates some action, like getting a data from
+a database or readinga file or printing to the screen. Our type doesn't say what
+that action might be (it could do anything!), but it does say that the action has
+to result in a value with a certain other type --`Maybe Response`.
 
 > addWhatHandler :: Context -> Text -> IO (Maybe Response)
 > addWhatHandler ctxt t =
 >   Just <$> notFoundText ("What should I add to " `T.append` t `T.append` "?")
 
-It doesn't make sense to "add" just one thing. You need something to add it to.
-So this is notFound.
+Here is a function makes it a little clearer how to create an "IO (Maybe Response)".
+
+In this function, `return` is an IO action that just returns a value.
 
 > addNumbersHandler :: Context -> Int -> Int -> IO (Maybe Response)
 > addNumbersHandler ctxt firstNumber secondNumber =
