@@ -61,7 +61,8 @@
 <span class="co">-- instance RequestContext AppContext where</span>
 <span class="co">--   getRequest ????</span>
 <span class="co">--   setRequest ????</span></code></pre></div>
-<p>(Need help?)</p>
+
+<p>If you run `stack build fntutorial:site1`, you can build just your changes to this site.</p>
 <hr />
 <p>Okay, so back to <code>Context</code>. How do we actually use that?</p>
 <div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">site ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">Response</span>
