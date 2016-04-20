@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Fn Tutorial by emhoracek</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Fn Tutorial, Part 3</h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.com/emhoracek/fntutorial" class="btn">View on GitHub</a>
+      <a href="https://github.com/emhoracek/fntutorial/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/emhoracek/fntutorial/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+
+<p>Using Lucid for HTML responses.</p>
+<p>Again you can run this &quot;site&quot; by typing:</p>
+<p>stack exec site3</p>
+<p>And again, I'll take you through how it works, line by line!</p>
+<p>Getting the basics out of the way:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Web.Fn</span>
+<span class="kw">import </span><span class="dt">Network.Wai</span> (<span class="dt">Response</span>, <span class="dt">Application</span>)
+<span class="kw">import </span><span class="dt">Network.Wai.Handler.Warp</span> (run)
+<span class="kw">import </span><span class="dt">Data.Monoid</span> ((&lt;&gt;))
+<span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">T</span>
+<span class="kw">import </span><span class="dt">Data.Text</span> (<span class="dt">Text</span>)
+<span class="kw">import </span><span class="dt">Data.Text.Lazy</span> (toStrict)</code></pre></div>
+<p>For this site, we're going to add HTML with Lucid!</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Lucid</span></code></pre></div>
+<p>Still need this text helper:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">tShow ::</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text</span>
+tShow <span class="fu">=</span> T.pack <span class="fu">.</span> show</code></pre></div>
+<p>We'll use the same Context:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Context</span> <span class="fu">=</span> <span class="dt">Context</span> {<span class="ot"> req ::</span> <span class="dt">FnRequest</span> }
+<span class="kw">instance</span> <span class="dt">RequestContext</span> <span class="dt">Context</span> <span class="kw">where</span>
+ getRequest ctxt <span class="fu">=</span> req ctxt
+ setRequest ctxt newRequest <span class="fu">=</span> ctxt { req <span class="fu">=</span> newRequest }</code></pre></div>
+<p>Because we still don't need anything besides a request from a user.</p>
+<p>But <code>site</code> is going to be a bit different.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">site ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">Response</span>
+site ctxt <span class="fu">=</span> route ctxt [ end <span class="fu">==&gt;</span> indexHandler
+                       , path <span class="st">&quot;add&quot;</span> <span class="fu">//</span> param <span class="st">&quot;t1&quot;</span> <span class="fu">//</span> param <span class="st">&quot;t2&quot;</span> <span class="fu">==&gt;</span> addNumbersHandler
+                       , path <span class="st">&quot;add&quot;</span> <span class="fu">//</span> param <span class="st">&quot;t1&quot;</span> <span class="fu">//</span> param <span class="st">&quot;t2&quot;</span> <span class="fu">==&gt;</span> addWordsHandler
+                       , path <span class="st">&quot;add&quot;</span> <span class="fu">//</span> end <span class="fu">==&gt;</span> addHandler
+                       ]
+            <span class="ot">`fallthrough`</span> notFoundText <span class="st">&quot;Page not found.&quot;</span></code></pre></div>
+<p>The routes have changed a little bit. Now we're matching on parameters instead of path segments. (Had to move addHandler to bottom).</p>
+<p>Our handlers are going to change because now we're going to use Lucid to create HTML templates.</p>
+<p>Here's what building up a Lucid template might look like:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">indexView ::</span> <span class="dt">Html</span> ()
+indexView <span class="fu">=</span> <span class="kw">do</span>
+  html_ <span class="fu">$</span> <span class="kw">do</span>
+    head_ <span class="fu">$</span> <span class="kw">do</span>
+      title_ <span class="st">&quot;My third Haskell site&quot;</span>
+    body_ <span class="fu">$</span> <span class="kw">do</span>
+      h1_ <span class="st">&quot;My third Haskell site&quot;</span>
+      p_ <span class="st">&quot;Try visiting \&quot;add\&quot;!&quot;</span></code></pre></div>
+<p>You can functions in a do block the same way you'd nest tags! This is pretty cool.</p>
+<p>But look at the type! <code>indexView</code> has the type <code>Html ()</code>. Our handlers return <code>Maybe Response</code>.</p>
+<p>Fn provides <code>okHtml</code>, a &quot;200 OK&quot; response for HTML, which expects <code>Text</code>. So we have fill the gap between Lucid's <code>Html ()</code> and <code>Text</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">lucidHtml ::</span> <span class="dt">Html</span> () <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> <span class="dt">Response</span>)
+lucidHtml h <span class="fu">=</span> okHtml <span class="fu">$</span> toStrict <span class="fu">$</span> renderText h</code></pre></div>
+<p>Lucid's <code>renderText</code> takes <code>Html ()</code> and returns lazy text. Then we can use <code>toStrict</code> to turn it into the <code>Text</code> we want.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">indexHandler ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> <span class="dt">Response</span>)
+indexHandler ctxt <span class="fu">=</span> lucidHtml indexView</code></pre></div>
+<p>So beautiful!</p>
+<p>Let's use HTML to create a form for the <code>addHandler</code> as well:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">addView ::</span> <span class="dt">Html</span> ()
+addView <span class="fu">=</span> <span class="kw">do</span>
+  html_ <span class="fu">$</span> <span class="kw">do</span>
+    body_ <span class="fu">$</span> <span class="kw">do</span>
+      form_ [action_ <span class="st">&quot;add&quot;</span>] <span class="fu">$</span> <span class="kw">do</span>
+        label_ [for_ <span class="st">&quot;t1&quot;</span>] <span class="st">&quot;Thing 1:&quot;</span>
+        input_ [id_ <span class="st">&quot;t1&quot;</span>, name_ <span class="st">&quot;t1&quot;</span>, type_ <span class="st">&quot;text&quot;</span>]
+        label_ [for_ <span class="st">&quot;t2&quot;</span>] <span class="st">&quot;Thing 2:&quot;</span>
+        input_ [id_ <span class="st">&quot;t2&quot;</span>, name_ <span class="st">&quot;t2&quot;</span>, type_ <span class="st">&quot;text&quot;</span>]
+        input_ [type_ <span class="st">&quot;submit&quot;</span>]</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">addHandler ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> <span class="dt">Response</span>)
+addHandler ctxt <span class="fu">=</span> lucidHtml addView</code></pre></div>
+<p>Let's inline some HTML into these handlers:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">addNumbersHandler ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> <span class="dt">Response</span>)
+addNumbersHandler ctxt firstNumber secondNumber <span class="fu">=</span>
+  lucidHtml <span class="fu">$</span> <span class="kw">do</span>
+    p_ <span class="fu">$</span> toHtml (<span class="st">&quot;The sum of &quot;</span> <span class="fu">&lt;&gt;</span> tShow firstNumber <span class="fu">&lt;&gt;</span> <span class="st">&quot; and &quot;</span> <span class="fu">&lt;&gt;</span> tShow secondNumber
+                 <span class="fu">&lt;&gt;</span> <span class="st">&quot; is &quot;</span> <span class="fu">&lt;&gt;</span> tShow (firstNumber <span class="fu">+</span> secondNumber))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">addWordsHandler ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> <span class="dt">Response</span>)
+addWordsHandler ctxt firstWord secondWord <span class="fu">=</span>
+  lucidHtml <span class="fu">$</span> <span class="kw">do</span>
+    p_ <span class="fu">$</span> toHtml (firstWord <span class="fu">&lt;&gt;</span> <span class="st">&quot; and &quot;</span> <span class="fu">&lt;&gt;</span> secondWord <span class="fu">&lt;&gt;</span> <span class="st">&quot; added together is &quot;</span>
+                 <span class="fu">&lt;&gt;</span> (firstWord <span class="fu">&lt;&gt;</span> secondWord))</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">main ::</span> <span class="dt">IO</span> ()
+main <span class="fu">=</span> run <span class="dv">3000</span> waiApp</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">waiApp ::</span> <span class="dt">Application</span>
+waiApp <span class="fu">=</span> toWAI (<span class="dt">Context</span> defaultFnRequest) site</code></pre></div>
+
+
+<p><a href="https://github.com/emhoracek/fntutorial/Site3.html">On to the next -></a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/emhoracek/fntutorial">Fn Tutorial</a> is maintained by <a href="https://github.com/emhoracek">emhoracek</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+
+  </body>
+</html>

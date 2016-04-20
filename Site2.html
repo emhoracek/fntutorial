@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>Fn Tutorial by emhoracek</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylesheets/normalize.css" media="screen">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+  </head>
+  <body>
+    <section class="page-header">
+      <h1 class="project-name">Fn Tutorial, Part 2</h1>
+      <h2 class="project-tagline"></h2>
+      <a href="https://github.com/emhoracek/fntutorial" class="btn">View on GitHub</a>
+      <a href="https://github.com/emhoracek/fntutorial/zipball/master" class="btn">Download .zip</a>
+      <a href="https://github.com/emhoracek/fntutorial/tarball/master" class="btn">Download .tar.gz</a>
+    </section>
+
+    <section class="main-content">
+
+      <p>Route and handlers!</p>
+<p>Again you can run this &quot;site&quot; by typing:</p>
+<p>stack exec site2</p>
+<p>And again, I'll take you through how it works, line by line!</p>
+<p>First, lets get the basics from part 1 out of the way:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">{-# LANGUAGE OverloadedStrings #-}</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Web.Fn</span>
+<span class="kw">import </span><span class="dt">Network.Wai</span> (<span class="dt">Response</span>, <span class="dt">Application</span>)
+<span class="kw">import </span><span class="dt">Network.Wai.Handler.Warp</span> (run)</code></pre></div>
+<p>And some useful stuff for text:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">import </span><span class="dt">Data.Monoid</span> ((&lt;&gt;))
+<span class="kw">import qualified</span> <span class="dt">Data.Text</span> <span class="kw">as</span> <span class="dt">T</span>
+<span class="kw">import </span><span class="dt">Data.Text</span> (<span class="dt">Text</span>)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">tShow ::</span> <span class="dt">Show</span> a <span class="ot">=&gt;</span> a <span class="ot">-&gt;</span> <span class="dt">Text</span>
+tShow <span class="fu">=</span> T.pack <span class="fu">.</span> show</code></pre></div>
+<p>We'll use the same Context:</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="kw">data</span> <span class="dt">Context</span> <span class="fu">=</span> <span class="dt">Context</span> {<span class="ot"> req ::</span> <span class="dt">FnRequest</span> }
+<span class="kw">instance</span> <span class="dt">RequestContext</span> <span class="dt">Context</span> <span class="kw">where</span>
+ getRequest ctxt <span class="fu">=</span> req ctxt
+ setRequest ctxt newRequest <span class="fu">=</span> ctxt { req <span class="fu">=</span> newRequest }</code></pre></div>
+<p>Because we still don't need anything besides a request from a user.</p>
+<p>But <code>site</code> is going to be a bit different, because we're going to add more routes!</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">site ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> <span class="dt">Response</span>
+site ctxt <span class="fu">=</span> route ctxt [ end <span class="fu">==&gt;</span> indexHandler
+                       , path <span class="st">&quot;add&quot;</span> <span class="fu">//</span> end <span class="fu">==&gt;</span> addHandler
+                       , path <span class="st">&quot;add&quot;</span> <span class="fu">//</span> segment <span class="fu">//</span> segment <span class="fu">//</span> end <span class="fu">==&gt;</span> addNumbersHandler
+                       , path <span class="st">&quot;add&quot;</span> <span class="fu">//</span> segment <span class="fu">//</span> segment <span class="fu">//</span> end <span class="fu">==&gt;</span> addWordsHandler
+                       ]
+            <span class="ot">`fallthrough`</span> notFoundText <span class="st">&quot;Page not found.&quot;</span></code></pre></div>
+<p><code>route</code> is a function that takes a RequestContext and a list of routes. It will try to match the current requested path against one of the paths listed in the routes. Fn lets you use the <code>//</code> operator to combine different types of segments into a complete path that might match a request. Then you use the <code>==&gt;</code> operator to tell which Handler might handle a request for that path.</p>
+<p>I say &quot;might&quot; match or handle a request because there's always the possibility that while, say, &quot;/add/2/2&quot; makes sense for the &quot;addNumbersHandler&quot; to handle, maybe &quot;/add/apple/oranges&quot; should be handled by the &quot;addWordsHandler&quot;. But if none of the routes can handle it, the request will &quot;fallthrough&quot; and <code>site</code> will respond with a the text &quot;Page not found.&quot;</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">indexHandler ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> <span class="dt">Response</span>)
+indexHandler ctxt <span class="fu">=</span> okText <span class="st">&quot;Welcome to my SECOND Haskell website! Try visiting \&quot;add\&quot;!&quot;</span></code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">addHandler ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> <span class="dt">Response</span>)
+addHandler ctxt <span class="fu">=</span> okText <span class="st">&quot;Find the result of adding different things by visitng \&quot;add/firstThing/secondThing/\&quot;&quot;</span></code></pre></div>
+<p>Hey it's our old friend the indexHandler! And a very similar one called <code>addHandler</code>. This time lets take a closer look at the type signature. It takes a Context and returns somethign with this other type, <code>IO (Maybe Response)</code>.</p>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">addNumbersHandler ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">Int</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> <span class="dt">Response</span>)
+addNumbersHandler ctxt firstNumber secondNumber <span class="fu">=</span>
+  okText <span class="fu">$</span> <span class="st">&quot;The sum of &quot;</span> <span class="fu">&lt;&gt;</span> tShow firstNumber <span class="fu">&lt;&gt;</span> <span class="st">&quot; and &quot;</span> <span class="fu">&lt;&gt;</span> tShow secondNumber
+           <span class="fu">&lt;&gt;</span> <span class="st">&quot; is &quot;</span> <span class="fu">&lt;&gt;</span> tShow (firstNumber <span class="fu">+</span> secondNumber)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">addWordsHandler ::</span> <span class="dt">Context</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">Text</span> <span class="ot">-&gt;</span> <span class="dt">IO</span> (<span class="dt">Maybe</span> <span class="dt">Response</span>)
+addWordsHandler ctxt firstWord secondWord <span class="fu">=</span>
+  okText <span class="fu">$</span> firstWord <span class="fu">&lt;&gt;</span> <span class="st">&quot; and &quot;</span> <span class="fu">&lt;&gt;</span> secondWord <span class="fu">&lt;&gt;</span> <span class="st">&quot; added together is &quot;</span>
+           <span class="fu">&lt;&gt;</span> (firstWord <span class="fu">&lt;&gt;</span> secondWord)</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">main ::</span> <span class="dt">IO</span> ()
+main <span class="fu">=</span> run <span class="dv">3000</span> waiApp</code></pre></div>
+<div class="sourceCode"><pre class="sourceCode literate haskell"><code class="sourceCode haskell"><span class="ot">waiApp ::</span> <span class="dt">Application</span>
+waiApp <span class="fu">=</span> toWAI (<span class="dt">Context</span> defaultFnRequest) site</code></pre></div>
+
+<p><a href="https://github.com/emhoracek/fntutorial/Site3.html">On to the next -></a></p>
+
+      <footer class="site-footer">
+        <span class="site-footer-owner"><a href="https://github.com/emhoracek/fntutorial">Fn Tutorial</a> is maintained by <a href="https://github.com/emhoracek">emhoracek</a>.</span>
+
+        <span class="site-footer-credits">This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the <a href="https://github.com/jasonlong/cayman-theme">Cayman theme</a> by <a href="https://twitter.com/jasonlong">Jason Long</a>.</span>
+      </footer>
+
+    </section>
+
+
+  </body>
+</html>
