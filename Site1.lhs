@@ -20,11 +20,6 @@ going on.
 
 > {-# LANGUAGE OverloadedStrings #-}
 
-Haskell is a pretty small language without a lot of baked-in features. You can
-add extra features by including"pragmas" like this to beginning of the file.
-"OverloadedStrings" makes working with text a lot easier than it is in plain
-Haskell.
-
 > import Web.Fn
 > import Network.Wai (Response, Application)
 > import Network.Wai.Handler.Warp (run)
