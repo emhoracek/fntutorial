@@ -2,10 +2,23 @@
 This is a tutorial for the Haskell web framework Fn. It's designed to give
 web developers an idea of how Haskell web development works. It won't
 teach you *everything* you need to know, but I hope it'll give you a place to
-start and an idea of just how fun it is! You don't have to know any Haskell to
-begin, but you'll want to know how to use git and command line. 
+start and an idea of just how fun it is!
 
-To get started, clone this repository:
+To get started, you need to know [how to use git](git@github.com:emhoracek/fntutorial.git)
+and some [command line basics](git@github.com:emhoracek/fntutorial.git).
+
+You also want to know a little Haskell:
+
+  * What are types and functions in Haskell?
+  * How do you define a data type?
+  * How do you make a data type an instance of a type class?
+  * What the Maybe type?
+  * How do you do stuff "in IO"?
+
+[Learn you a Haskell](http://learnyouahaskell.com/) is one way to learn these basics,
+and it's free online! You can also try the [Haskell wikibook](https://en.wikibooks.org/wiki/Haskell).
+
+When you're ready to get started, clone this repository:
 
 `git clone https://github.com/emhoracek/fntutorial.git`
 
@@ -20,7 +33,7 @@ Then change to the `fntutorial` directory, and run `stack build`. This will down
 
 (If you have any problems building, let me know so I can help!)
 
-Once the build is finished, run `stack exec site1` and visit [localhost:8000](http://localhost:8000) to see a "Hello world" Haskell site running on your machine! Type CTRL-C to kill the server when you're done.
+Once the build is finished, run `stack exec site1` and visit [localhost:8000](http://localhost:8000) to see a "Hello world" Haskell site running on your machine! Type CTRL-C to quit the server when you're done.
 
 Each site's source code contains a part of the tutorial. Read each "*.lhs" file's source to learn how to make Haskell sites with Fn, WAI, and Warp!
 
