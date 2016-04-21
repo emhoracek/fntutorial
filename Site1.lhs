@@ -122,3 +122,7 @@ Change the site and handler to use the AppContext data structure instead of
 Context. (You'll need to tell `waiApp` how to build an AppContext:
 `AppContext defaultFnRequest "your string here"`). Can you make the
 `indexHandler` return a response containing the `secretKey`?
+
+[Back to previous](http://fnhaskell.com/tutorial/index.html)
+
+[To the next](http://fnhaskell.com/tutorial/Site2.html)
