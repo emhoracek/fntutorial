@@ -41,4 +41,4 @@ Each site's source code contains a part of the tutorial. Read each "*.lhs" file'
 * "Site2.lhs" - `stack exec site2` -- how do routes and handlers work? (not done yet!)
 *  ...more to come!
 
-(I will add more resources for how to learn more here)
+[Start the tutorial!](http://fnhaskell.com/tutorial/Site1.html)

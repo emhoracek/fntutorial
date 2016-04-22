@@ -113,3 +113,7 @@ Let's inline some HTML into these handlers:
 
 > waiApp :: Application
 > waiApp = toWAI (Context defaultFnRequest) site
+
+[Back to previous](http://fnhaskell.com/tutorial/Site3.html)
+
+[To the README](http://fnhaskell.com/tutorial/index.html)
