@@ -14,7 +14,7 @@ Visit localhost:3000, and you'll see a message!
 How does it work?!
 
 Well --- this is the source!! This page is written in "Literate Haskell", so
-you can run it as source code. I'll take you line by line and show you what's
+you can run it as source code. I'll take you through line by line and show you what's
 going on.
 
 > {-# LANGUAGE OverloadedStrings #-}
@@ -66,7 +66,7 @@ Here's another RequestContext:
 Okay, I got very very silly here, but I want to make the point that it's not
 really important that your app specifically have a `Context`, but it's important that
 it has *something* (even a `PizzaJungle`!) that's a `RequestContext`. Also
-notice that you can as many and whatever fields you want in your context, as
+notice that you can have as many and whatever fields you want in your context, as
 long as you also have some field (name doesn't matter!) that's an `FnRequest`.</span>
 
 Exercise
@@ -85,6 +85,8 @@ How could you write the `RequestContext` instance for `AppContext`?
 > --   setRequest ????
 
 (Need help?)
+
+Once you make changes, you should run `stack build` and `stack exec site1` to recompile and run the new code.
 
 --------
 

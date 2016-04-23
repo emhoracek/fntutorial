@@ -69,12 +69,12 @@ will respond with a the text "Page not found."
 > indexHandler :: Context -> IO (Maybe Response)
 > indexHandler ctxt = okText "Welcome to my SECOND Haskell website! Try visiting \"hello\" or \"add\"!"
 
-Hey it's our old friend the indexHandler! And a very similar one
-called `helloHandler`. This time lets take a closer look at the type
+Hey, it's our old friend the indexHandler! And a very similar one
+called `helloHandler`. This time, let's take a closer look at the type
 signature. It takes a Context and returns something with this other
 type, `IO (Maybe Response)`.
 
-[`okText`]http://hackage.haskell.org/package/fn-0.3.0.1/docs/Web-Fn.html#v:okText)
+[`okText`](http://hackage.haskell.org/package/fn-0.3.0.1/docs/Web-Fn.html#v:okText)
 has the type `Text -> IO (Maybe Response)`. We give it Text, it
 creates a Response with the right status code (200) and content type
 (text/plain), then returns "Just" that response.
