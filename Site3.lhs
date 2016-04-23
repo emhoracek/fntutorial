@@ -65,7 +65,7 @@ Here's what building up a Lucid template might look like:
 >       h1_ "My third Haskell site"
 >       p_ "Try visiting \"add\"!"
 
-You can functions in a do block the same way you'd nest tags! This is pretty cool.
+You can put functions in a do block the same way you'd nest tags! This is pretty cool.
 
 But look at the type! `indexView` has the type `Html ()`. Our handlers
 return `Maybe Response`.

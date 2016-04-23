@@ -4,7 +4,7 @@ Serving static files.
 
 Again you can run this "site" by typing:
 
-stack exec site3
+stack exec site4
 
 And again, I'll take you through how it works, line by line!
 
@@ -45,7 +45,7 @@ But next we'll allow static serving with a handler from Fn:
 >                        ]
 >             `fallthrough` notFoundText "Page not found."
 
-We're doing that to add stylesheets, so lets make a "template" for the Lucid HTML.
+We're doing that to add stylesheets, so let's make a "template" for the Lucid HTML.
 
 > baseView :: Text -> Html () -> Html ()
 > baseView title rest = do
@@ -63,7 +63,7 @@ Then we can write all our views using the same base.
 >       h1_ "My fourth Haskell site"
 >       p_ "Try visiting \"add\"!"
 
-You can functions in a do block the same way you'd nest tags! This is pretty cool.
+You can put functions in a do block the same way you'd nest tags! This is pretty cool.
 
 But look at the type! `indexView` has the type `Html ()`. Our handlers
 return `Maybe Response`.
