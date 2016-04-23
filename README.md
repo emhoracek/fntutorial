@@ -4,8 +4,8 @@ web developers an idea of how Haskell web development works. It won't
 teach you *everything* you need to know, but I hope it'll give you a place to
 start and an idea of just how fun it is!
 
-To get started, you need to know [how to use git](git@github.com:emhoracek/fntutorial.git)
-and some [command line basics](git@github.com:emhoracek/fntutorial.git).
+To get started, you need to know [how to use git](https://git-scm.com/)
+and some [command line basics](http://cli.learncodethehardway.org/book/).
 
 You also want to know a little Haskell:
 
