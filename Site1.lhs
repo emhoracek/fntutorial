@@ -86,6 +86,8 @@ How could you write the `RequestContext` instance for `AppContext`?
 
 (Need help?)
 
+Once you make changes, you should run `stack build` and `stack exec site1` to recompile and run the new code.
+
 --------
 
 A Route and a Handler
