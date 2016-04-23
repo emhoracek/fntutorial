@@ -33,7 +33,7 @@ Then change to the `fntutorial` directory, and run `stack build`. This will down
 
 (If you have any problems building, let me know so I can help!)
 
-Once the build is finished, run `stack exec site1` and visit [localhost:8000](http://localhost:8000) to see a "Hello world" Haskell site running on your machine! Type CTRL-C to quit the server when you're done.
+Once the build is finished, run `stack exec site1` and visit [localhost:3000](http://localhost:8000) to see a "Hello world" Haskell site running on your machine! Type CTRL-C to quit the server when you're done.
 
 Each site's source code contains a part of the tutorial. Read each "*.lhs" file's source to learn how to make Haskell sites with Fn, WAI, and Warp!
 
