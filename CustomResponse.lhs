@@ -86,7 +86,7 @@ type, `IO (Maybe Response)`.
 >            <> (firstWord <> secondWord)
 
 > main :: IO ()
-> main = run 3000 waiApp
+> main = run 2000 waiApp
 
 > waiApp :: Application
 > waiApp = toWAI (Context defaultFnRequest) site

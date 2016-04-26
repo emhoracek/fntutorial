@@ -20,13 +20,26 @@ And some useful stuff for text:
 > import Data.Monoid ((<>))
 > import qualified Data.Text as T
 > import Data.Text (Text)
+> import Web.Fn.Extra.Heist
 
 > tShow :: Show a => a -> Text
 > tShow = T.pack . show
 
 We'll use the same Context:
 
-> data Context = Context { req :: FnRequest }
+> data Context = Context { req   :: FnRequest
+>                         , heist :: FnHeistState Context }
+
+> instance HeistContext Context where
+>   getHeist ctxt = heist ctxt
+
+> initializer = do
+>   eitherErrorHeist <- heistInit ["templates"] mempty
+>   let heistState =  case eitherErrorHeist of
+>                      Right hs -> hs
+>                      Left  e  -> error "whoops"
+>   return (Context defaultFnRequest heistState)
+
 > instance RequestContext Context where
 >  getRequest ctxt = req ctxt
 >  setRequest ctxt newRequest = ctxt { req = newRequest }
@@ -36,21 +49,17 @@ Because we still don't need anything besides a request from a user.
 And WAI and Warp are the same:
 
 > main :: IO ()
-> main = run 7000 waiApp
-
-> waiApp :: Application
-> waiApp = toWAI (Context defaultFnRequest) site
+> main = do
+>   init <- initializer
+>   run 4000 (toWAI init site)
 
 But `site` is going to be a bit different, because we're going to add more routes!
 
 > site :: Context -> IO Response
 > site ctxt = route ctxt [ end ==> indexHandler
->                        , path "hello" // segment // end ==> silentTreatmentHandler
->                        , path "hello" // end ==> helloHandler
->                        , path "hello" ==> helloNameHandler
+>                        , path "hello" // segment // end ==> helloNameHandler
 >                        , path "add" // end ==> addHandler
 >                        , path "add" // segment // segment // end ==> addNumbersHandler
->                        , path "add" // param "n1" // param "n2" // end ==> addNumbersHandler
 >                        , path "add" // segment // segment // end ==> addWordsHandler
 >                        ]
 >             `fallthrough` notFoundText "Page not found."
@@ -69,7 +78,7 @@ none of the routes can handle it, the request will "fallthrough" and `site`
 will respond with a the text "Page not found."
 
 > indexHandler :: Context -> IO (Maybe Response)
-> indexHandler ctxt = okText "Try visiting \"hello\" or \"add\"!"
+> indexHandler ctxt = okText "Welcome to my SECOND Haskell website! Try visiting \"hello\" or \"add\"!"
 
 Hey, it's our old friend the indexHandler! And a very similar one
 called `helloHandler`. This time, let's take a closer look at the type
@@ -84,8 +93,10 @@ creates a Response with the right status code (200) and content type
 Here's a the handler which will handle "localhost:3000/hello", according to this route: `path "hello" // end ==> helloHandler`.
 This handler looks very similar!
 
-> helloHandler :: Context -> IO (Maybe Response)
-> helloHandler ctxt = okText "Hello, world!"
+> helloNameHandler :: Context -> Text -> IO (Maybe Response)
+> helloNameHandler ctxt name =
+>   renderWithSplices ctxt "hello" $ do
+>     tag' "name" name
 
 But the next route is a little different. `path "hello" // segment //
 end ==> helloNameHandler` can handle a URL like
@@ -93,8 +104,6 @@ end ==> helloNameHandler` can handle a URL like
 the URL is passed as an argument to the handler. This also affects
 the type of the handler.
 
-> helloNameHandler :: Context -> IO (Maybe Response)
-> helloNameHandler ctxt = okText "Not you again"
 
 This Handler has an additional argument and we've specified that it's
 text so that we can combine it with the word "hello" to create a

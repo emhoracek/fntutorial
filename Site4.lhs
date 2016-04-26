@@ -48,7 +48,7 @@ But next we'll allow static serving with a handler from Fn:
 We're doing that to add stylesheets, so let's make a "template" for the Lucid HTML.
 
 > baseView :: Text -> Html () -> Html ()
-> baseView title rest = do
+> baseView title rest =
 >   html_ $ do
 >     head_ $ do
 >       link_ [href_ "style.css", rel_ "stylesheet", type_ "text/css"]
@@ -58,10 +58,10 @@ We're doing that to add stylesheets, so let's make a "template" for the Lucid HT
 Then we can write all our views using the same base.
 
 > indexView :: Html ()
-> indexView =
->   baseView "My fourth Haskell site" $ do
->       h1_ "My fourth Haskell site"
->       p_ "Try visiting \"add\"!"
+> indexView = baseView "My fancy Haskell site" $
+>    body_ $
+>      p_ "Welcome to my first FANCY Haskell website"
+
 
 You can put functions in a do block the same way you'd nest tags! This is pretty cool.
 

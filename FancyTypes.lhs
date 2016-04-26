@@ -22,7 +22,8 @@ going on.
 > import Web.Fn
 > import Network.Wai (Response, Application)
 > import Network.Wai.Handler.Warp (run)
-> import Data.Text (Text)
+> import Data.Text (Text, pack)
+> import Data.Monoid ((<>))
 
 These import the libraries we'll need for the website: Fn, WAI (Web Application
 Interface), and Warp. In Haskell, you can import modules from libraries with
@@ -37,7 +38,7 @@ Why are we importing these specific things?
 * WAI is a common interface for web libraries and frameworks, and allows you to use all sorts of middleware (like it sounds, stuff in the middle between your app and the server).
 * Data.Text allows us to use Text, which is [nicer than Strings](http://stackoverflow.com/questions/19608745/data-text-vs-string).
 
-> data Context = Context { req :: FnRequest }
+> data Ctxt = Ctxt { req :: FnRequest }
 
 Next we make the context for our application. The idea is that
 there's data we want to access when we're preparing a Response to send out to
@@ -46,7 +47,7 @@ Fn, we wrap all those things up in a "Context". Since in this part of the tutori
 making the simplest app possible, we're only going to worry about the most
 basic information the user sends us -- the request.
 
-> instance RequestContext Context where
+> instance RequestContext Ctxt where
 >  getRequest ctxt = req ctxt
 >  setRequest ctxt newRequest = ctxt { req = newRequest }
 
@@ -95,16 +96,34 @@ A Route and a Handler
 
 Okay, so back to `Context`. How do we actually use that?
 
-> site :: Context -> IO Response
-> site ctxt = route ctxt [ end ==> indexHandler ]
->                  `fallthrough` notFoundText "Page not found."
+
+> site :: Ctxt -> IO Response
+> site ctxt =
+>  route ctxt [ end ==> indexH
+>             , path "add" // segment // segment // end ==> addNumbersH
+>             , path "add" // param "n1" // param "n2"  ==> addNumbersH
+>             , path "add" // segment // segment // end ==> addWordsH ]
+>  `fallthrough` notFoundText "Page not found."
+
+> addNumbersH :: Ctxt -> Int -> Int -> IO (Maybe Response)
+> addNumbersH ctxt number1 number2 =
+>  let sum = number1 + number2 in
+>  okText (showT number1 <> " plus " <>
+>          showT number2 <> " is " <> showT sum <> ".")
+> showT :: Show a => a -> Text
+> showT = pack . show
+
+> addWordsH :: Ctxt -> Text -> Text -> IO (Maybe Response)
+> addWordsH ctxt word1 word2 =
+>   okText (word1 <> " plus " <> word2 <> " is " <> word1 <> word2 <> ".")
+
 
 Our "site" is a way to take our Context, and turn it into a
 Response. Don't worry too much about it right now because I'll go into much
 more depth in the next part on routes!
 
-> indexHandler :: Context -> IO (Maybe Response)
-> indexHandler ctxt = okText "Welcome to my first Haskell website."
+> indexH :: Ctxt -> IO (Maybe Response)
+> indexH ctxt = okText "A site that uses types! Try visiting \"add/something/something\"."
 
 Hey, it's our first handler! This handles a request by taking a context and
 giving back a response (again, we'll go into more detail on just what that
@@ -112,10 +131,10 @@ giving back a response (again, we'll go into more detail on just what that
 to do the same thing every time someone requests this page -- just send a message.
 
 > main :: IO ()
-> main = run 1025 waiApp
+> main = run 3000 waiApp
 
 > waiApp :: Application
-> waiApp = toWAI (Context defaultFnRequest) site
+> waiApp = toWAI (Ctxt defaultFnRequest) site
 
 I said earlier that WAI is the interface between our site and the server. This
 is where we use WAI. Warp expects an app, so we use Fn's "toWAI" function to
