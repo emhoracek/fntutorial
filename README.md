@@ -4,8 +4,8 @@ web developers an idea of how Haskell web development works. It won't
 teach you *everything* you need to know, but I hope it'll give you a place to
 start and an idea of just how fun it is!
 
-To get started, you need to know [how to use git](git@github.com:emhoracek/fntutorial.git)
-and some [command line basics](git@github.com:emhoracek/fntutorial.git).
+To get started, you need to know [how to use git](https://git-scm.com/)
+and some [command line basics](http://cli.learncodethehardway.org/book/).
 
 You also want to know a little Haskell:
 
@@ -33,12 +33,12 @@ Then change to the `fntutorial` directory, and run `stack build`. This will down
 
 (If you have any problems building, let me know so I can help!)
 
-Once the build is finished, run `stack exec site1` and visit [localhost:8000](http://localhost:8000) to see a "Hello world" Haskell site running on your machine! Type CTRL-C to quit the server when you're done.
+Once the build is finished, run `stack exec site1` and visit [localhost:3000](http://localhost:8000) to see a "Hello world" Haskell site running on your machine! Type CTRL-C to quit the server when you're done.
 
 Each site's source code contains a part of the tutorial. Read each "*.lhs" file's source to learn how to make Haskell sites with Fn, WAI, and Warp!
 
 * "Site1.lhs" - `stack exec site1` -- a "Hello world!" site
-* "Site2.lhs" - `stack exec site2` -- how do routes and handlers work? (not done yet!)
-*  ...more to come!
+* "Site2.lhs" - `stack exec site2` -- how do routes and handlers work?
+* "Site3.lhs" - `stack exec site3` -- using Lucid for HTML responses
 
 [Start the tutorial!](http://fnhaskell.com/tutorial/Site1.html)

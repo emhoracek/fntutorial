@@ -1,21 +1,20 @@
-Fn Tutorial
-
-Fn is a simple web framework build in Haskell.
-
-This tutorial will show you how to make a very simple website with Fn.
-
 The Simplest Site
 -----------------
 
+Assuming you've downloaded [the source for this tutorial](https://www.github.com/emhoracek/fntutorial),
+you can run your first website with the following commands:
+
+```
 stack build
 stack exec site1
+```
 
-visit localhost:3000
+Visit localhost:3000, and you'll see a message!
 
 How does it work?!
 
-well --- this is the source!! This page is written in "Literate Haskell", so
-you can run it as source code. I'll take you line by line and show you what's
+Well --- this is the source!! This page is written in "Literate Haskell", so
+you can run it as source code. I'll take you through line by line and show you what's
 going on.
 
 > {-# LANGUAGE OverloadedStrings #-}
@@ -35,7 +34,8 @@ Why are we importing these specific things?
 
 * Fn is our web framework
 * Warp is the server
-* WAI is middleware (like it sounds, stuff in the middle between the framework and server).
+* WAI is a common interface for web libraries and frameworks, and allows you to use all sorts of middleware (like it sounds, stuff in the middle between your app and the server).
+* Data.Text allows us to use Text, which is [nicer than Strings](http://stackoverflow.com/questions/19608745/data-text-vs-string).
 
 > data Context = Context { req :: FnRequest }
 
@@ -53,6 +53,8 @@ basic information the user sends us -- the request.
 These lines make `Context` an "instance" of `RequestContext`. Fn will use these
 functions, `getRequest` and `setRequest`, to help us respond to requests.
 
+Here's another RequestContext:
+
 > data PizzaJungle = Totoro { request :: FnRequest,
 >                             mothersMaidenName :: String,
 >                             isAmbidextrous :: Bool }
@@ -64,7 +66,7 @@ functions, `getRequest` and `setRequest`, to help us respond to requests.
 Okay, I got very very silly here, but I want to make the point that it's not
 really important that your app specifically have a `Context`, but it's important that
 it has *something* (even a `PizzaJungle`!) that's a `RequestContext`. Also
-notice that you can as many and whatever fields you want in your context, as
+notice that you can have as many and whatever fields you want in your context, as
 long as you also have some field (name doesn't matter!) that's an `FnRequest`.</span>
 
 Exercise
@@ -84,7 +86,12 @@ How could you write the `RequestContext` instance for `AppContext`?
 
 (Need help?)
 
+Once you make changes, you should run `stack build` and `stack exec site1` to recompile and run the new code.
+
 --------
+
+A Route and a Handler
+---------------------
 
 Okay, so back to `Context`. How do we actually use that?
 
@@ -110,13 +117,13 @@ to do the same thing every time someone requests this page -- just send a messag
 > waiApp :: Application
 > waiApp = toWAI (Context defaultFnRequest) site
 
-I said earlier that WAI is the middleware between our site and the server. This
+I said earlier that WAI is the interface between our site and the server. This
 is where we use WAI. Warp expects an app, so we use Fn's "toWAI" function to
 turn an initial context and our `site` into an Application. `run 3000 waiApp`
 means to run the Warp server with this app on port 3000.
 
-Exercises
----------
+Exercise
+--------
 
 Change the site and handler to use the AppContext data structure instead of
 Context. (You'll need to tell `waiApp` how to build an AppContext:
