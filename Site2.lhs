@@ -167,7 +167,7 @@ resulting in, "cat and dog added together is catdog".
 
 How does this work? A request with the pattern
 "add/something/something" will reach an `add // segment // segment`
-route. Haskell's type inference will figure out that `segment` needs
+route. Haskell will figure out that `segment` needs
 to be an `Int` in order to be passed to `addNumbersHandler`. So Fn
 will try to parse "something" into an Int! But that makes no sense, so
 it returns "Nothing" -- the request falls through to the next route.

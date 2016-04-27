@@ -1,10 +1,9 @@
-Fn Tutorial, part 3!
-
-Using Lucid for HTML responses.
+Using Lucid for HTML responses
+------------------------------
 
 Again you can run this "site" by typing:
 
-stack exec site3
+`stack exec site3`
 
 And again, I'll take you through how it works, line by line!
 
@@ -114,6 +113,8 @@ Let's inline some HTML into these handlers:
 >     p_ $ toHtml (firstWord <> " and " <> secondWord <> " added together is "
 >                  <> (firstWord <> secondWord))
 
+And run the site!
+
 > main :: IO ()
 > main = run 3000 waiApp
 
@@ -121,5 +122,3 @@ Let's inline some HTML into these handlers:
 > waiApp = toWAI (Context defaultFnRequest) site
 
 [Back to previous](http://fnhaskell.com/tutorial/Site2.html)
-
-[To the next](http://fnhaskell.com/tutorial/Site4.html)

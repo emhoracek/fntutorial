@@ -38,7 +38,7 @@ Once the build is finished, run `stack exec site1` and visit [localhost:3000](ht
 Each site's source code contains a part of the tutorial. Read each "*.lhs" file's source to learn how to make Haskell sites with Fn, WAI, and Warp!
 
 * "Site1.lhs" - `stack exec site1` -- a "Hello world!" site
-* "Site2.lhs" - `stack exec site2` -- how do routes and handlers work? (not done yet!)
-*  ...more to come!
+* "Site2.lhs" - `stack exec site2` -- how do routes and handlers work?
+* "Site3.lhs" - `stack exec site3` -- using Lucid for HTML responses
 
 [Start the tutorial!](http://fnhaskell.com/tutorial/Site1.html)
