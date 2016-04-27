@@ -1,13 +1,15 @@
 Route and handlers
 ------------------
 
+Let's learn more about how routes and handlers work.
+
 Again, you can run this "site" by typing:
 
 `stack exec site2`
 
 And again, I'll take you through how it works, line by line!
 
-First, lets get the basics from part 1 out of the way:
+First, lets get the basic imports from part 1 out of the way:
 
 > {-# LANGUAGE OverloadedStrings #-}
 
@@ -18,11 +20,17 @@ First, lets get the basics from part 1 out of the way:
 And some useful stuff for text:
 
 > import Data.Monoid ((<>))
+
+(Monoids are things you can smoosh together (like text!), the `<>`
+operator lets you smoosh them.)
+
 > import qualified Data.Text as T
 > import Data.Text (Text)
 
 > tShow :: Show a => a -> Text
 > tShow = T.pack . show
+
+(This take anything you can use `show` on and turn it into Text.)
 
 We'll use the same Context:
 
@@ -130,15 +138,39 @@ Matching on types
 > addHandler :: Context -> IO (Maybe Response)
 > addHandler ctxt = okText "Find the result of adding different things by visitng \"add/firstThing/secondThing/\""
 
+The last couple routes show how Fn tries to match segments with types.
+
+These two route patterns:
+
+```
+  path "add" // segment // segment // end ==> addNumbersHandler
+  path "add" // segment // segment // end ==> addWordsHandler
+```
+
+look exactly the same! But "add/1/2" will be handled by `addNumbersHandler`:
+
 > addNumbersHandler :: Context -> Int -> Int -> IO (Maybe Response)
 > addNumbersHandler ctxt firstNumber secondNumber =
 >   okText $ "The sum of " <> tShow firstNumber <> " and " <> tShow secondNumber
 >            <> " is " <> tShow (firstNumber + secondNumber)
 
+resulting an response saying, "The sum of 1 and 2 is 3".
+
+On the other hand, "add/cat/dog" will be handled by `addWordsHandler`:
+
 > addWordsHandler :: Context -> Text -> Text -> IO (Maybe Response)
 > addWordsHandler ctxt firstWord secondWord =
 >   okText $ firstWord <> " and " <> secondWord <> " added together is "
 >            <> (firstWord <> secondWord)
+
+resulting in, "cat and dog added together is catdog".
+
+How does this work? A request with the pattern
+"add/something/something" will reach an `add // segment // segment`
+route. Haskell's type inference will figure out that `segment` needs
+to be an `Int` in order to be passed to `addNumbersHandler`. So Fn
+will try to parse "something" into an Int! But that makes no sense, so
+it returns "Nothing" -- the request falls through to the next route.
 
 [Back to previous](http://fnhaskell.com/tutorial/Site1.html)
 
