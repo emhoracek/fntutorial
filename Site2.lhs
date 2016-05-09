@@ -113,8 +113,8 @@ sure can!
 > silentTreatmentHandler :: Context -> Text -> IO (Maybe Response)
 > silentTreatmentHandler ctxt name =
 >   case name of
->   "dbp"     -> return Nothing
->   otherwise -> okText ("Hello, " <> name <> "!")
+>     "dbp" -> return Nothing
+>     _     -> okText ("Hello, " <> name <> "!")
 
 This is a handler that can choose to ignore some people! If I use this
 handler instead of `helloNameHandler`, then visit
