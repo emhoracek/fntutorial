@@ -44,7 +44,7 @@ Because we still don't need anything besides a request from a user.
 And WAI and Warp are the same:
 
 > main :: IO ()
-> main = run 3000 waiApp
+> main = run 5000 waiApp
 
 > waiApp :: Application
 > waiApp = toWAI (Context defaultFnRequest) site

@@ -1,3 +1,4 @@
+
 Using Lucid for HTML responses
 ------------------------------
 
@@ -48,7 +49,9 @@ But `site` is going to be a bit different.
 >             `fallthrough` notFoundText "Page not found."
 
 The routes have changed a little bit. Now we're matching on parameters
-instead of path segments. (Had to move addHandler to bottom).
+instead of path segments. You may notice that `addHandler`'s route was
+moved to the bottom. That's because "add // end" matches requests
+that have params as well.
 
 Our handlers are going to change because now we're going to use Lucid
 to create HTML templates.
